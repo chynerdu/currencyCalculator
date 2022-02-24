@@ -1,4 +1,4 @@
-# currencyconverter
+# currencycalculator
 
 A new Flutter project.
 
