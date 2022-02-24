@@ -1,5 +1,6 @@
 import 'package:currencyconverter/common/colors.dart';
 import 'package:currencyconverter/common/components/currencyListing.dart';
+import 'package:currencyconverter/common/helpers/appTourTargets.dart';
 import 'package:currencyconverter/common/helpers/sizeManager.dart';
 import 'package:currencyconverter/common/theme.dart';
 import 'package:currencyconverter/common/ui/appBar.dart';
@@ -26,12 +27,23 @@ class HomeScreenState extends State<HomeScreen> {
   TextEditingController currency2 = TextEditingController();
   TextEditingController currencyOneAmount = TextEditingController();
   TextEditingController currencyTwoAmount = TextEditingController();
+  final GlobalKey selectCurrencyOne = new GlobalKey();
+  final GlobalKey selectCurrencyTwo = new GlobalKey();
+  final GlobalKey amountKey = new GlobalKey();
   double rate = 0;
+  AppTourTargets appTourTargets = AppTourTargets();
 
   initState() {
-    getCurrency();
-    currencyOneAmount.text = 0.toString();
-    currencyTwoAmount.text = 0.toString();
+    WidgetsBinding.instance!.addPostFrameCallback((_) {
+      getCurrency();
+      currencyOneAmount.text = 0.toString();
+      currencyTwoAmount.text = 0.toString();
+      appTourTargets.addTargets(
+          context: context,
+          selectCurrencyOne: selectCurrencyOne,
+          selectCurrencyTwo: selectCurrencyTwo,
+          amountKey: amountKey);
+    });
     super.initState();
   }
 
@@ -104,6 +116,7 @@ class HomeScreenState extends State<HomeScreen> {
                 ),
                 SizedBox(height: 40),
                 Input(
+                    key: amountKey,
                     controller: currencyOneAmount,
                     validator: (String? value) {},
                     onSaved: (String? value) {},
@@ -128,10 +141,51 @@ class HomeScreenState extends State<HomeScreen> {
                     )),
                 SizedBox(height: 40),
                 Row(
+                  // key: selectCurrencyOne,
                   children: [
-                    Expanded(
-                      // width: sizeManager.scaledWidth(35),
-                      child: GestureDetector(
+                    Container(
+                      key: selectCurrencyOne,
+                      child: Expanded(
+                          // width: sizeManager.scaledWidth(35),
+                          child: GestureDetector(
+                              onTap: () async {
+                                FocusScope.of(context)
+                                    .requestFocus(new FocusNode());
+                                final result = await bottomSheetPopUp(
+                                  ctx: context,
+                                  child: Container(
+                                    height: 300,
+                                    child: CurrencyList(
+                                        selectedCurrency: '${currency2.text}'),
+                                  ),
+                                );
+                                setState(() {
+                                  currency1.text = result ?? currency1.text;
+                                  if (result != null)
+                                    currencyTwoAmount.text = 0.toString();
+                                });
+                              },
+                              child: Input(
+                                  fillColor: Color(0xFFFFFFFF),
+                                  controller: currency1,
+                                  readOnly: true,
+                                  enabled: false,
+                                  validator: (String? value) {},
+                                  onSaved: (String? value) {},
+                                  borderColor: Color(0xFFD3D3D3),
+                                  styleColor: Color(0xFF8F8F8F),
+                                  suffix: Icon(Icons.arrow_drop_down)))),
+                    ),
+                    SizedBox(width: 10),
+                    Icon(Icons.repeat_outlined,
+                        size: 30, color: Color(0xFF8F8F8F)),
+                    SizedBox(width: 10),
+                    Container(
+                        key: selectCurrencyTwo,
+                        // key: selectCurrencyTwo,
+                        child: Expanded(
+                            // width: sizeManager.scaledWidth(35),
+                            child: GestureDetector(
                           onTap: () async {
                             FocusScope.of(context)
                                 .requestFocus(new FocusNode());
@@ -140,60 +194,26 @@ class HomeScreenState extends State<HomeScreen> {
                               child: Container(
                                 height: 300,
                                 child: CurrencyList(
-                                    selectedCurrency: '${currency2.text}'),
+                                    selectedCurrency: '${currency1.text}'),
                               ),
                             );
                             setState(() {
-                              currency1.text = result ?? currency1.text;
+                              currency2.text = result ?? currency2.text;
                               if (result != null)
                                 currencyTwoAmount.text = 0.toString();
                             });
                           },
                           child: Input(
                               fillColor: Color(0xFFFFFFFF),
-                              controller: currency1,
+                              controller: currency2,
                               readOnly: true,
                               enabled: false,
+                              styleColor: Color(0xFF8F8F8F),
                               validator: (String? value) {},
                               onSaved: (String? value) {},
                               borderColor: Color(0xFFD3D3D3),
-                              styleColor: Color(0xFF8F8F8F),
-                              suffix: Icon(Icons.arrow_drop_down))),
-                    ),
-                    SizedBox(width: 10),
-                    Icon(Icons.repeat_outlined,
-                        size: 30, color: Color(0xFF8F8F8F)),
-                    SizedBox(width: 10),
-                    Expanded(
-                        // width: sizeManager.scaledWidth(35),
-                        child: GestureDetector(
-                      onTap: () async {
-                        FocusScope.of(context).requestFocus(new FocusNode());
-                        final result = await bottomSheetPopUp(
-                          ctx: context,
-                          child: Container(
-                            height: 300,
-                            child: CurrencyList(
-                                selectedCurrency: '${currency1.text}'),
-                          ),
-                        );
-                        setState(() {
-                          currency2.text = result ?? currency2.text;
-                          if (result != null)
-                            currencyTwoAmount.text = 0.toString();
-                        });
-                      },
-                      child: Input(
-                          fillColor: Color(0xFFFFFFFF),
-                          controller: currency2,
-                          readOnly: true,
-                          enabled: false,
-                          styleColor: Color(0xFF8F8F8F),
-                          validator: (String? value) {},
-                          onSaved: (String? value) {},
-                          borderColor: Color(0xFFD3D3D3),
-                          suffix: Icon(Icons.arrow_drop_down)),
-                    )),
+                              suffix: Icon(Icons.arrow_drop_down)),
+                        ))),
                   ],
                 ),
                 SizedBox(height: 40),

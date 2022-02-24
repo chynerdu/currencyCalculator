@@ -45,7 +45,7 @@ class _SplashState extends State<Splash> {
                     children: [
                       Center(
                           child: Container(
-                              width: sizeManager.scaledWidth(60),
+                              // width: sizeManager.scaledWidth(100),
                               child: Text('Currency Calculator',
                                   style: CurrencyCalculatorTheme.appNameStyle
                                       .copyWith(fontSize: 20)))),

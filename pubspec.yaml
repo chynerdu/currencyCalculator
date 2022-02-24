@@ -30,6 +30,8 @@ dependencies:
   modal_bottom_sheet: ^2.0.0
   get: 4.5.1
   http: ^0.13.3
+  tutorial_coach_mark: ^1.1.1
+  shared_preferences: ^2.0.5
 
 dev_dependencies:
   flutter_test:
